@@ -1,3 +1,5 @@
+import java.util.Map;
+
 public class UnboundedInt implements Cloneable {
     
     private int manyNodes;
@@ -48,6 +50,12 @@ public class UnboundedInt implements Cloneable {
         if (equals(other)) {
             //
         }
+        
+        if (manyNodes == 0)
+            return other;
+        if (other.manyNodes == 0)
+            return this;
+        
         UnboundedInt answer = new UnboundedInt();
         int temp = 0, carryOver = 0;
         start();
@@ -76,6 +84,8 @@ public class UnboundedInt implements Cloneable {
             answer.addEnd(temp);
             curNode++;
         }
+        if (carryOver == 1)
+            answer.addEnd(1);
         
         
         return answer;
@@ -83,7 +93,6 @@ public class UnboundedInt implements Cloneable {
     }
     
     public UnboundedInt multiply(UnboundedInt other) {
-        
         if (head == null || other.head == null)
             throw new IllegalStateException("Head is null");
         
@@ -91,28 +100,44 @@ public class UnboundedInt implements Cloneable {
             if (head.getData() == 0 || other.head.getData() == 0)
                 return new UnboundedInt();
         }
-        
-        UnboundedInt[] products = new UnboundedInt[manyNodes];
-        
-        
-        UnboundedInt answer = new UnboundedInt();
-        
-        
         start();
         other.start();
         
-        int place = 0;
-        
-        
+        UnboundedInt answer = new UnboundedInt();
+        for (int x = 0; x < manyNodes; x++) {
+            answer = answer.add(multiplierHelper(other, getNodeValue()));
+            advance();
+        }
         return answer;
     }
-    private UnboundedInt multiplierHelper(UnboundedInt multiplicand, int multiplier) {
+    
+    public UnboundedInt multiplierHelper(UnboundedInt multiplicand, int multiplier) {
         UnboundedInt answer = new UnboundedInt();
         
-        int temp = 0;
+        int temp;
+        int carryOver = 0;
+        multiplicand.start();
+        for (int x = 0 ; x < multiplicand.manyNodes; x++) {
+            temp = multiplier * multiplicand.getNodeValue();
+            
+            temp += carryOver;
+            
+            if (temp > 1000) {
+                carryOver = temp / 1000;
+                temp %= 1000;
+            } else {
+                carryOver = 0;
+            }
+            
+            multiplicand.addEnd(temp);
+            answer.addEnd(temp);
+            multiplicand.advance();
+            
+        }
+        if (carryOver > 0)
+            answer.addEnd(carryOver);
         
-        
-        
+        return answer;
     }
     
     public void addEnd(int i) {
