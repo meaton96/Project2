@@ -7,6 +7,7 @@ public class UnboundedInt implements Cloneable{
 
     public UnboundedInt(String s) {
 
+        manyNodes = 0;
         head = createNodes(s);
         cursor = head;
         if (head != null)
@@ -20,24 +21,40 @@ public class UnboundedInt implements Cloneable{
         head = null;
     }
 
+    
     private IntNode createNodes(String s) {
 
         if (s.length() == 0)
             return null;
-        if (s.length() >= 3)
-            return new IntNode(
-                    Integer.parseInt(s.substring(s.length() - 3)),
-                    createNodes(s.substring(0, s.length() - 3)));
-
+        if (s.length() >= 3) {
+            manyNodes++;
+            try {
+                return new IntNode(
+                        Integer.parseInt(s.substring(s.length() - 3)),
+                        createNodes(s.substring(0, s.length() - 3)));
+            }
+            catch (NumberFormatException e) {
+                System.out.println("String is not numbers!");
+            }
+        }
+        manyNodes++;
         return new IntNode(Integer.parseInt(s), null);
 
     }
     public UnboundedInt add(UnboundedInt other) {
+        
+        
+        if (equals(other)) {
+            //
+        }
         UnboundedInt answer = new UnboundedInt();
         int temp = 0, carryOver = 0;
         start();
         other.start();
-        while (cursor != null && other.cursor != null) {
+        
+        //check many nodes to see which number is bigger and loop through that one
+        
+       /* while (cursor != null && other.cursor != null) {
             temp = getNodeValue() + other.getNodeValue() + carryOver;
             if (temp > 999) {
                 carryOver = 1;
@@ -58,25 +75,52 @@ public class UnboundedInt implements Cloneable{
                 answer.addEnd(other.getNodeValue());
                 other.advance();
             }
-        }
+        }*/
 
+        int curNode = 0;
+        while (curNode < Math.max(manyNodes, other.manyNodes)) {
+            temp = 0;
+            if (cursor != null) {
+                temp += getNodeValue();
+                advance();
+            }
+            if (other.cursor != null) {
+                temp += other.getNodeValue();
+                other.advance();
+            }
+            temp += carryOver;
+            if (temp < 999) {
+                temp -= 1000;
+                carryOver = 1;
+            } else {
+                carryOver = 0;
+            }
+            answer.addEnd(temp);
+            curNode++;
+        }
+        
+        
         return answer;
 
     }
     public UnboundedInt multiply(UnboundedInt other) {
 
+        if (head == null || other.head == null)
+            throw new IllegalStateException("Head is null");
+        
+        if (manyNodes == 1 || other.manyNodes == 1) {
+            if (head.getData() == 0 || other.head.getData() == 0)
+                return new UnboundedInt();
+        }
+        
         UnboundedInt answer = new UnboundedInt();
-
-        int temp = 0, carryOver = 0;
+        
+        
         start();
         other.start();
 
-        while (cursor != null && other.cursor != null) {
-            temp = getNodeValue() * other.getNodeValue();
-            if (temp > 1000) {
-                //TO FINISH
-            }
-        }
+        int place = 0;
+        
 
         return answer;
     }
