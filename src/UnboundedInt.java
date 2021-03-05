@@ -1,12 +1,18 @@
-import java.util.Map;
-
 public class UnboundedInt implements Cloneable {
     
-    private int manyNodes;
-    private IntNode head;
-    private IntNode back;
-    private IntNode cursor;
+    private int manyNodes;              //number of nodes in the number
+    private IntNode head;               //first node
+    private IntNode back;               //last node
+    private IntNode cursor;             //current node for iterating all nodes
     
+    /**
+     * @precondition s is a string of numbers, manyNodes = 0, head, back, and cursor are null
+     * @postcondition s has been turned into a collection of nodes representing 3 places of an integer
+     * head points to the first node, back to the last node, cursor to the first node, head begins at the 0s place of the number
+     * constructor, creates a new unbound from the supplied string
+     * @param s a string of digits to make the integer from
+     * @throws IllegalArgumentException if given string s is not a number
+     */
     public UnboundedInt(String s) {
         
         manyNodes = 0;
@@ -20,6 +26,9 @@ public class UnboundedInt implements Cloneable {
         
     }
     
+    /**
+     * @precondition
+     */
     public UnboundedInt() {
         head = null;
     }
@@ -36,7 +45,7 @@ public class UnboundedInt implements Cloneable {
                         Integer.parseInt(s.substring(s.length() - 3)),
                         createNodes(s.substring(0, s.length() - 3)));
             } catch (NumberFormatException e) {
-                System.out.println("String is not numbers!");
+                throw new IllegalArgumentException("Given string is not a number!");
             }
         }
         manyNodes++;
@@ -105,32 +114,32 @@ public class UnboundedInt implements Cloneable {
         
         UnboundedInt answer = new UnboundedInt();
         for (int x = 0; x < manyNodes; x++) {
-            answer = answer.add(multiplierHelper(other, getNodeValue()));
+            answer = answer.add(scalarMultiply(other, getNodeValue()));
             advance();
         }
         return answer;
     }
     
-    public UnboundedInt multiplierHelper(UnboundedInt multiplicand, int multiplier) {
+    public UnboundedInt scalarMultiply(UnboundedInt multiplicand, int multiplier) {
         UnboundedInt answer = new UnboundedInt();
         
-        int temp;
+        int currentProduct;
         int carryOver = 0;
         multiplicand.start();
         for (int x = 0 ; x < multiplicand.manyNodes; x++) {
-            temp = multiplier * multiplicand.getNodeValue();
+            currentProduct = multiplier * multiplicand.getNodeValue();
             
-            temp += carryOver;
+            currentProduct += carryOver;
             
-            if (temp > 1000) {
-                carryOver = temp / 1000;
-                temp %= 1000;
+            if (currentProduct > 1000) {
+                carryOver = currentProduct / 1000;
+                currentProduct %= 1000;
             } else {
                 carryOver = 0;
             }
             
-            multiplicand.addEnd(temp);
-            answer.addEnd(temp);
+            multiplicand.addEnd(currentProduct);
+            answer.addEnd(currentProduct);
             multiplicand.advance();
             
         }
