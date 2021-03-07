@@ -75,16 +75,13 @@ public class UnboundedInt implements Cloneable {
      * @return a new UnboundInt that is the sum of the two other UnboundInts
      */
     public UnboundedInt add(UnboundedInt other) {
-        if (equals(other))
-            return scalarMultiply(this, 2);                                     //if the 2 numbers are equal just multiply by a scalar 2 for efficiency
-        
         if (manyNodes == 0)                                                     //if one of the UnboundInts are empty just return the other one as the sum
             return other;
         if (other.manyNodes == 0)
             return this;
         
         UnboundedInt answer = new UnboundedInt();                               //create an answer UnboundInt and set both cursors to head node of respective Ints
-        int curSum = 0, carryOver = 0;
+        int curSum, carryOver = 0;
         start();
         other.start();
         
