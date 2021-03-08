@@ -108,7 +108,7 @@ public class UnboundedInt implements Cloneable {
             answer.addEnd(curSum);                                              //add the current sum to the end of the answer UnboundInt
             curNode++;                                                          //increment which node we are adding
         }
-        if (carryOver == 1)                                                     //if there was a carry over from the final sum then add it to the end
+        if (carryOver == 1)                                               //if there was a carry over from the final sum then add it to the end
             answer.addEnd(1);
         
         return answer;
@@ -136,8 +136,7 @@ public class UnboundedInt implements Cloneable {
         UnboundedInt answer = new UnboundedInt();                               //create a new UnboundInt for the product
         for (int x = 0; x < manyNodes; x++) {                                   //iterate this numbers nodes and use the value of each to multiply the other number by that node value
             answer = answer.add(
-                    scalarMultiply(other,
-                            (int) (getNodeValue() * Math.pow(10, x * 3))));
+                    scalarMultiply(other, getNodeValue(), x * 3));
             advance();                                                          //add the scalar product to the answer UnboundInt and advance the cursor
         }
         return answer;
@@ -149,33 +148,30 @@ public class UnboundedInt implements Cloneable {
      * @param multiplier the value to multiply by
      * @return a new UnboundInt that is the product of the multiplicand and the multiplier
      */
-    public static UnboundedInt scalarMultiply(UnboundedInt multiplicand, int multiplier) {
+    public static UnboundedInt scalarMultiply(UnboundedInt multiplicand, int multiplier, int numZeros) {
         UnboundedInt answer = new UnboundedInt();
+        UnboundedInt curProd;
+        StringBuilder zeros = new StringBuilder();
         
-        int currentProduct;
-        int carryOver = 0;
+        zeros.append("0".repeat(Math.max(0, numZeros)));
+        
         multiplicand.start();                                                   //set multiplicand cursor to the head node
         for (int x = 0 ; x < multiplicand.manyNodes; x++) {                     //iterate through all of the multiplicand's nodes
-            currentProduct = multiplier * multiplicand.getNodeValue();          //multiply it by the scalar value
-            
-            currentProduct += carryOver;                                        //add the previous carry over value if there was one
-            
-            if (currentProduct > 1000) {                                        //if the current product is over 1000 then set the carry over to the value above 1000
-                carryOver = currentProduct / 1000;                              //and set the current product to the remainder
-                currentProduct %= 1000;
-            } else {
-                carryOver = 0;
-            }
-            
-            answer.addEnd(currentProduct);                                      //add the current product to the end of the product
+            curProd = new UnboundedInt(
+                    (multiplier * multiplicand.getNodeValue())                  //multiply it by the scalar value
+                            + zeros.toString());                                //add additional zeros
+            answer = answer.add(curProd);
             multiplicand.advance();                                             //advance the cursor
-            
+            zeros.append("000");                                                //add additional zeros to multiplier as you move up in places in the number
         }
-        if (carryOver > 0)                                                      //add the final carry over if there is one
-            answer.addEnd(carryOver);
         
         return answer;
     }
+    
+    /*public UnboundedInt multiplyNew(UnboundedInt other) {
+        UnboundedInt product = new UnboundedInt();
+        
+    }*/
     
     /**
      * add the integer value to the end of the of the int
@@ -192,10 +188,12 @@ public class UnboundedInt implements Cloneable {
             head = new IntNode(i, null);
             back = head;
             cursor = head;
+            manyNodes++;
             return;
         }
         back.setLink(new IntNode(i, null));         //otherwise add the value as a new node to the end and set back to it
         back = back.getLink();
+        manyNodes++;
     }
     
     /**
