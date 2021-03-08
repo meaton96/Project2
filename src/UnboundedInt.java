@@ -146,6 +146,9 @@ public class UnboundedInt implements Cloneable {
      * multiply an UnboundInt by a scalar value
      * @param multiplicand the UnboundInt to multiply
      * @param multiplier the value to multiply by
+     * @param numZeros the number of zeros to add to the multiplier after multiplication has finished
+     *                 this is used to raise the multiplier by a power of 10 so you can
+     *                 multiply by any number even if its more than Integer.MAX_VALUE
      * @return a new UnboundInt that is the product of the multiplicand and the multiplier
      */
     public static UnboundedInt scalarMultiply(UnboundedInt multiplicand, int multiplier, int numZeros) {
